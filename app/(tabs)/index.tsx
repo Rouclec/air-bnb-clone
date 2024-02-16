@@ -1,31 +1,39 @@
-import { StyleSheet } from 'react-native';
+import { SafeAreaView } from "react-native";
+import React, { useMemo, useState } from "react";
+import { Stack } from "expo-router";
+import { exploreStyles as styles } from "@/styles";
+import {
+  ExploreHeader,
+  Listings,
+  ListingsBottomSheet,
+  Map,
+} from "@/components";
 
-import EditScreenInfo from '@/components/EditScreenInfo';
-import { Text, View } from '@/components/Themed';
+import listingsData from "@/assets/data/air-bnb-listings.json";
+import listingsDataGeo from "@/assets/data/airbnb-listings.geo.json";
+import { Listing, ListingGeo } from "@/interfaces";
 
-export default function TabOneScreen() {
+const Page = () => {
+  const [category, setCategory] = useState("Tiny homes");
+  const items = useMemo(() => listingsData as Listing[], []);
+  const geoItems = useMemo(() => listingsDataGeo as ListingGeo, []);
+
+  const onDataChanged = (category: string) => {
+    //TODO: change data when categories is changed
+    setCategory(category);
+  };
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Tab One</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/index.tsx" />
-    </View>
+    <SafeAreaView style={styles.container}>
+      <Stack.Screen
+        options={{
+          header: () => <ExploreHeader onCategoryChanged={onDataChanged} />,
+        }}
+      />
+      {/* <Listings listings={items} category={category} /> */}
+      <Map listing={geoItems} />
+      <ListingsBottomSheet listings={items} category={category} />
+    </SafeAreaView>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
-  },
-});
+export default Page;
